@@ -214,6 +214,20 @@ class AgentPresetSubagentRef(BaseModel):
     )
 
 
+class McpIntegrationRefMeta(BaseModel):
+    """Natural-key hint used to correlate a source MCP integration reference."""
+
+    model_config = ConfigDict(extra="allow")
+
+    slug: str = Field(min_length=1, description="Source MCP integration slug.")
+    server_type: str = Field(description="Source MCP server type.")
+    auth_type: str = Field(description="Source MCP authentication type.")
+    name: str | None = Field(
+        default=None,
+        description="Source MCP integration display name.",
+    )
+
+
 class AgentPresetVersionResourceSpec(BaseModel):
     """Immutable agent preset snapshot stored under a preset's versions dir."""
 
@@ -274,6 +288,11 @@ class AgentPresetVersionResourceSpec(BaseModel):
     mcp_integrations: list[str] = Field(
         default_factory=list,
         description="MCP integration slugs available to the agent.",
+    )
+    # Correlation hint only; None keeps pre-existing manifests byte-identical.
+    mcp_integration_meta: dict[str, McpIntegrationRefMeta] | None = Field(
+        default=None,
+        description="Natural-key metadata keyed by source MCP integration id.",
     )
     retries: int = Field(
         default=3,
